@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+python-multipart
+python-dotenv
+supabase
+httpx
+easyocr
+torch
+torchvision
+torchaudio --index-url https://download.pytorch.org/whl/cpu
+numpy
+python-jose[cryptography]
+passlib[bcrypt]
+pandas
+jinja2
