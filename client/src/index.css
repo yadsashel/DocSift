@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 216 50% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 216 50% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 216 50% 12%;
+    --primary: 216 72% 25%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 25% 94%;
+    --secondary-foreground: 216 50% 12%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 15% 46%;
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 20% 91%;
+    --input: 210 20% 91%;
+    --ring: 199 89% 48%;
+    --radius: 0.75rem;
+
+    --sidebar-background: 216 72% 8%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 216 60% 14%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 216 40% 16%;
+    --sidebar-ring: 199 89% 48%;
+
+    /* DocSift brand tokens */
+    --brand-start: 216 72% 25%;
+    --brand-end: 195 100% 42%;
+    --glow-color: 199 89% 48%;
+    --success: 152 69% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 216 72% 6%;
+    --foreground: 210 20% 95%;
+    --card: 216 60% 10%;
+    --card-foreground: 210 20% 95%;
+    --popover: 216 60% 10%;
+    --popover-foreground: 210 20% 95%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 216 40% 16%;
+    --secondary-foreground: 210 20% 95%;
+    --muted: 216 40% 16%;
+    --muted-foreground: 215 20% 60%;
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 216 40% 16%;
+    --input: 216 40% 16%;
+    --ring: 199 89% 48%;
+    --sidebar-background: 216 72% 4%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 216 50% 12%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 216 40% 12%;
+    --sidebar-ring: 199 89% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+  .glass-card {
+    background: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border) / 0.3);
+    box-shadow: 0 8px 32px hsl(var(--glow-color) / 0.08);
+  }
+  .glass-card-hover {
+    background: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border) / 0.3);
+    box-shadow: 0 8px 32px hsl(var(--glow-color) / 0.08);
+    transition: all 0.3s ease;
+  }
+  .glass-card-hover:hover {
+    box-shadow: 0 12px 48px hsl(var(--glow-color) / 0.15);
+    border-color: hsl(var(--accent) / 0.3);
+    transform: translateY(-4px);
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--brand-start)), hsl(var(--brand-end)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-bg {
+    background: linear-gradient(135deg, hsl(var(--brand-start)), hsl(var(--brand-end)));
+  }
+  .gradient-bg-hover {
+    background: linear-gradient(135deg, hsl(var(--brand-start)), hsl(var(--brand-end)));
+    transition: all 0.3s ease;
+  }
+  .gradient-bg-hover:hover {
+    box-shadow: 0 8px 30px hsl(var(--glow-color) / 0.35);
+    transform: translateY(-1px);
+  }
+  .glow {
+    box-shadow: 0 0 40px -10px hsl(var(--glow-color) / 0.4);
+  }
+  .glow-sm {
+    box-shadow: 0 0 20px -5px hsl(var(--glow-color) / 0.3);
+  }
+  .section-padding {
+    @apply py-20 md:py-28 lg:py-32;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(3deg); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px hsl(var(--glow-color) / 0.2); }
+  50% { box-shadow: 0 0 40px hsl(var(--glow-color) / 0.4); }
+}
