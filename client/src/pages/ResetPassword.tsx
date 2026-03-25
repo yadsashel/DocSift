@@ -7,6 +7,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
 
+// ✅ 1. الرابط العالمي من الـ Environment Variables
+const API_URL = import.meta.env.VITE_API_URL;
+
 const ResetPassword = () => {
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -23,7 +26,8 @@ const ResetPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/auth/reset-password", {
+      // ✅ 2. تحديث الرابط هنا لـ API_URL
+      const response = await fetch(`${API_URL}/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, token: code, new_password: newPassword }),
@@ -55,13 +59,27 @@ const ResetPassword = () => {
         <form onSubmit={handleReset} className="glass-card rounded-2xl p-8 space-y-5 border border-white/10 bg-black/40 backdrop-blur-md">
           <div className="space-y-2">
             <Label>Verification Code</Label>
-            <Input type="text" maxLength={6} placeholder="000000" value={code} onChange={e => setCode(e.target.value)} required className="h-11 text-center tracking-widest text-xl font-bold" />
+            <Input 
+              type="text" 
+              maxLength={6} 
+              placeholder="000000" 
+              value={code} 
+              onChange={e => setCode(e.target.value)} 
+              required 
+              className="h-11 text-center tracking-widest text-xl font-bold" 
+            />
           </div>
 
           <div className="space-y-2">
             <Label>New Password</Label>
             <div className="relative">
-              <Input type={showPassword ? "text" : "password"} value={newPassword} onChange={e => setNewPassword(e.target.value)} required className="h-11 bg-black/20" />
+              <Input 
+                type={showPassword ? "text" : "password"} 
+                value={newPassword} 
+                onChange={e => setNewPassword(e.target.value)} 
+                required 
+                className="h-11 bg-black/20" 
+              />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2">
                 {showPassword ? <EyeOff size={16}/> : <Eye size={16}/>}
               </button>

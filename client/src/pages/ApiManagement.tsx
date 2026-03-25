@@ -23,7 +23,7 @@ const ApiManagement = () => {
   const [isCreating, setIsCreating] = useState(false);
   const { toast } = useToast();
 
-  const API_BASE = "http://localhost:8000";
+  const API_BASE = import.meta.env.VITE_API_URL;
 
   useEffect(() => { fetchKeys(); }, []);
 

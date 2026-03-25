@@ -70,7 +70,7 @@ const Terms = () => (
     <p>We reserve the right to modify these Terms at any time. We will provide at least 30 days' notice of material changes via email and/or a prominent notice on our website. Your continued use of the Services after the effective date of any modification constitutes acceptance of the revised Terms.</p>
 
     <h2>14. Contact</h2>
-    <p>For questions regarding these Terms, please contact legal@docsift.com or write to: DocSift, Inc., 535 Mission Street, Suite 1400, San Francisco, CA 94105, USA.</p>
+    <p>For questions regarding these Terms, please contact docsift.official@gmail.com</p>
   </LegalLayout>
 );
 

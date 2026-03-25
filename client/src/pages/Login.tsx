@@ -7,6 +7,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
 
+// ✅ 1. تعريف الرابط العالمي فالفوق
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -21,7 +24,8 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/auth/login", {
+      // ✅ 2. عوضنا localhost بـ API_URL
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -83,7 +87,6 @@ export default function Login() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              {/* 🔥 Forgot Password Link Added Here */}
               <Link 
                 to="/forgot-password" 
                 className="text-xs text-accent hover:text-accent/80 transition-colors font-medium"

@@ -7,6 +7,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
 
+// ✅ 1. الرابط العالمي من الـ Environment Variables
+const API_URL = import.meta.env.VITE_API_URL;
+
 const passwordRules = [
   { label: "At least 6 characters", test: (p: string) => p.length >= 6 },
   { label: "One uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
@@ -40,7 +43,8 @@ export default function SignUp() {
 
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/auth/signup", {
+      // ✅ 2. تحديث الرابط هنا لـ API_URL
+      const response = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ full_name: name, email, password }),

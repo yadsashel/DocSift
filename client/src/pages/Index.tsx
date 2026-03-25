@@ -192,7 +192,7 @@ const Index = () => {
               </motion.div>
               <motion.div variants={fadeInUp}>
                 <Button variant="outline" size="lg" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 bg-transparent" asChild>
-                  <Link to="/api-docs">Read API Docs</Link>
+                  <Link to="/apidocs">Read API Docs</Link>
                 </Button>
               </motion.div>
             </motion.div>

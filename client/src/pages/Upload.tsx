@@ -2,6 +2,9 @@ import { useState, useCallback } from "react";
 import { Upload as UploadIcon, FileText, X, CheckCircle, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+// ✅ 1. الرابط العالمي من الـ Environment Variables
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface FileItem {
   name: string;
   size: string;
@@ -22,18 +25,17 @@ const UploadPage = () => {
     setFiles(prev => [...prev, newFile]);
 
     try {
-      // --- الـ Fixing Part: هاد السطور هما اللي كيصلحو الـ 422 ---
       const userId = localStorage.getItem("user_id");
       const formData = new FormData();
       formData.append("file", file);
       if (userId) {
         formData.append("user_id", userId);
       }
-      // -------------------------------------------------------
 
-      const response = await fetch("http://127.0.0.1:8000/upload", {
+      // ✅ 2. تحديث الرابط هنا لـ API_URL
+      const response = await fetch(`${API_URL}/upload`, {
         method: "POST",
-        body: formData, // ما تزيدش Headers هنا، المتصفح كيقادهم أوتوماتيكياً
+        body: formData, // المتصفح كيقاد الـ Headers أوتوماتيكياً للـ FormData
       });
 
       if (!response.ok) throw new Error("Upload failed");
@@ -75,7 +77,6 @@ const UploadPage = () => {
         <p className="text-muted-foreground text-sm">Drag and drop your contracts for AI-powered analysis</p>
       </div>
 
-      {/* Drop Zone: رجعت ليك الـ Style الأصلي بالكلمة */}
       <div
         onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
@@ -92,7 +93,6 @@ const UploadPage = () => {
         <Button variant="outline" size="sm">Browse Files</Button>
       </div>
 
-      {/* File List: رجعت ليك الـ Style الأصلي بالكلمة */}
       {files.length > 0 && (
         <div className="space-y-3">
           <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wider">Analysis Status</h3>
@@ -121,7 +121,7 @@ const UploadPage = () => {
                 )}
                 {file.status === "error" && (
                   <div className="flex items-center gap-2 text-xs text-red-500 font-bold">
-                    <AlertCircle className="h-3 w-3" /> UPLOAD/CREDIT ERROR
+                    <AlertCircle className="h-3 w-3" /> UPLOAD ERROR
                   </div>
                 )}
               </div>

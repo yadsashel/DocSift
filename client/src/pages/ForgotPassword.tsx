@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // ✅ تـصـلـحـات لـ react-router-dom
 import { ArrowLeft, Mail, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -18,7 +20,7 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/auth/forgot-password", {
+      const response = await fetch(`${API_URL}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -30,7 +32,6 @@ const ForgotPassword = () => {
       }
 
       toast({ title: "OTP Sent!", description: "Check your email for the reset code." });
-      // كاندوزوه لصفحة الـ Reset ونصيفطوا معاه الإيميل
       navigate("/reset-password", { state: { email } });
     } catch (error: any) {
       toast({ variant: "destructive", title: "Error", description: error.message });
@@ -41,7 +42,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-      <div className="absolute top-20 right-20 w-72 h-72 rounded-full bg-accent/5 blur-3xl animate-float" />
+      <div className="absolute top-20 right-20 w-72 h-72 rounded-full bg-accent/5 blur-3xl" />
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
           <Link to="/"><img src={logo} alt="DocSift" className="h-10 mx-auto mb-6" /></Link>

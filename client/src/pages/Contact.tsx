@@ -24,7 +24,7 @@ const Contact = () => {
             <h1 className="text-4xl font-bold mb-4">Get in Touch</h1>
             <p className="text-muted-foreground text-lg">Have questions about DocSift? We'd love to hear from you. Our team typically responds within 24 hours.</p>
           </div>
-
+ 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Contact Info */}
             <div className="space-y-6">

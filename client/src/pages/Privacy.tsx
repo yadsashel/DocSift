@@ -12,7 +12,7 @@ const Privacy = () => (
       <li><strong>Account Registration Data:</strong> Name, email address, company name, job title, phone number, and billing information when you create an account.</li>
       <li><strong>Contract Documents:</strong> Documents you upload to our platform for analysis, including contracts, agreements, and related attachments.</li>
       <li><strong>Communications:</strong> Information you provide when contacting our support team, participating in surveys, or providing feedback.</li>
-      <li><strong>Payment Information:</strong> Credit card numbers, billing addresses, and other payment details processed through our PCI-compliant payment processor (Stripe).</li>
+      <li><strong>Payment Information:</strong> Credit card numbers, billing addresses, and other payment details processed through our PCI-compliant payment processor.</li>
     </ul>
 
     <h3>2.2 Information Collected Automatically</h3>
@@ -59,7 +59,7 @@ const Privacy = () => (
     </ul>
 
     <h2>7. Data Retention</h2>
-    <p>We retain your account information for as long as your account is active or as needed to provide Services. Document analysis results are retained per your plan settings. You may request deletion of your data at any time by contacting privacy@docsift.com. Upon account closure, personal data is deleted within 90 days, subject to legal retention requirements.</p>
+    <p>We retain your account information for as long as your account is active or as needed to provide Services. Document analysis results are retained per your plan settings. You may request deletion of your data at any time by contacting docsift.official@gmail.com Upon account closure, personal data is deleted within 90 days, subject to legal retention requirements.</p>
 
     <h2>8. Your Rights</h2>
     <p>Depending on your jurisdiction, you may have the right to:</p>
@@ -83,9 +83,9 @@ const Privacy = () => (
     <h2>12. Contact Us</h2>
     <p>If you have questions about this Privacy Policy or our data practices, please contact us at:</p>
     <ul>
-      <li>Email: privacy@docsift.com</li>
-      <li>Data Protection Officer: dpo@docsift.com</li>
-      <li>Address: DocSift, Inc., 535 Mission Street, Suite 1400, San Francisco, CA 94105, USA</li>
+      <li>Email: docsift.official@gmail.com</li>
+      <li>Data Protection Officer: docsift.official@gmail.com</li>
+      <li>Address: DocSift, Distributed Globally Remote-First Team</li>
     </ul>
   </LegalLayout>
 );

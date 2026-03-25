@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
 
+// ✅ 1. الرابط العالمي
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Verify() {
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +23,8 @@ export default function Verify() {
 
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/auth/verify", {
+      // ✅ 2. تحديث الرابط لـ API_URL
+      const res = await fetch(`${API_URL}/auth/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, token: code }),
