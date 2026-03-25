@@ -2,11 +2,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import { FileText, Search, Filter, Download, X, Target, ChevronRight, Activity, Zap, Clock, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom"; // زدنا useNavigate للحماية
 import { motion, AnimatePresence } from "framer-motion";
+
+// ✅ الرابط العالمي من ملف الـ .env
+const API_URL = import.meta.env.VITE_API_URL;
 
 const DocumentVault = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -15,20 +19,37 @@ const DocumentVault = () => {
 
   const COLORS = ['#6366f1', '#f59e0b', '#10b981'];
 
+  // --- 🛠️ المصلّح (The Filtered Fetch) ---
   const fetchDocs = useCallback(async () => {
+    // 1. جبد الـ user_id من الـ localStorage
+    const userId = localStorage.getItem("user_id");
+
+    // 2. حماية: إيلا ماكاينش ID، صيفطو لـ Login أو حبس الـ Loading
+    if (!userId) {
+      console.error("🔒 Access Denied: No user_id found.");
+      setLoading(false);
+      // navigate("/login"); // تقدر تفعل هادي إيلا بغيتي يخرج نيشان
+      return;
+    }
+
     try {
-      // كنجيبو البيانات من الـ Endpoint الجديد اللي كيرجع كاع الملفات من الداتابيز
-      const res = await fetch("http://127.0.0.1:8000/files");
+      setLoading(true);
+      // 3. صيفط الـ user_id كـ Query Parameter للـ Backend
+      const res = await fetch(`${API_URL}/files?user_id=${userId}`);
+      
+      if (!res.ok) throw new Error("Failed to sync with vault");
+      
       const data = await res.json();
       setDocuments(data);
       
+      // التعامل مع الـ Direct Link (إيلا جاي من Dashboard بـ ID معين)
       const targetId = searchParams.get("id");
       if (targetId) {
         const found = data.find((d: any) => d.id === targetId);
         if (found) setSelectedDoc(found);
       }
     } catch (e) {
-      console.error("Vault Sync Error:", e);
+      console.error("❌ Vault Sync Error:", e);
     } finally {
       setLoading(false);
     }
@@ -41,7 +62,7 @@ const DocumentVault = () => {
   const handleExportAudit = async (fileId: string, fileName: string) => {
     setExporting(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/generate-report/${fileId}`);
+      const response = await fetch(`${API_URL}/generate-report/${fileId}`);
       if (!response.ok) throw new Error('Export failed');
       
       const blob = await response.blob();
@@ -60,7 +81,9 @@ const DocumentVault = () => {
     }
   };
 
-  const filtered = documents.filter(d => d.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = documents.filter(d => 
+    d.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   if (loading) return (
     <div className="h-screen flex items-center justify-center bg-background text-accent font-black tracking-[0.4em] animate-pulse uppercase text-[10px]">
@@ -71,13 +94,13 @@ const DocumentVault = () => {
   return (
     <div className="relative min-h-screen bg-background text-foreground p-4 md:p-8 max-w-[1600px] mx-auto overflow-x-hidden">
       
-      {/* Dynamic Background */}
+      {/* Background Decorative Elements */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
         <div className="absolute top-0 right-0 w-96 h-96 bg-accent/20 blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/20 blur-[100px]" />
       </div>
 
-      {/* Vault Header */}
+      {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 border-b border-border/40 pb-8">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-[9px] font-black uppercase tracking-[0.2em] mb-2">
@@ -86,26 +109,29 @@ const DocumentVault = () => {
           <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-none">
             Document <span className="gradient-text">Vault</span>
           </h1>
-          <p className="text-[10px] font-black text-muted-foreground opacity-60 uppercase tracking-[0.3em]">{documents.length} Verified Nodes</p>
+          <p className="text-[10px] font-black text-muted-foreground opacity-60 uppercase tracking-[0.3em]">
+            {documents.length} Verified Nodes
+          </p>
         </div>
-        <Button className="h-14 px-10 rounded-2xl font-black text-xs uppercase tracking-widest bg-accent hover:scale-105 transition-all shadow-2xl shadow-accent/20" asChild>
-          <a href="/upload">Inject New Asset</a>
+        <Button className="h-14 px-10 rounded-2xl font-black text-xs uppercase tracking-widest bg-accent hover:scale-105 transition-all shadow-2xl shadow-accent/20" onClick={() => navigate("/upload")}>
+          Inject New Asset
         </Button>
       </div>
 
-      {/* Search & Search Bar */}
+      {/* Search Bar */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8 relative z-10">
         <div className="relative flex-1 group">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-accent transition-colors" />
           <input 
             placeholder="FILTER VAULT BY IDENTIFIER..." 
             className="w-full pl-12 h-14 bg-muted/20 border border-border/40 rounded-2xl text-[10px] font-black tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
-            value={search} onChange={e => setSearch(e.target.value)}
+            value={search} 
+            onChange={e => setSearch(e.target.value)}
           />
         </div>
       </div>
 
-      {/* Main Grid Table */}
+      {/* Main Table */}
       <div className="glass-card rounded-3xl border border-border/40 shadow-2xl overflow-hidden relative z-10">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -118,7 +144,7 @@ const DocumentVault = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/10">
-              {filtered.map(doc => (
+              {filtered.length > 0 ? filtered.map(doc => (
                 <tr key={doc.id} onClick={() => setSelectedDoc(doc)} className="group cursor-pointer hover:bg-accent/[0.03] transition-all">
                   <td className="p-6">
                     <div className="flex items-center gap-4">
@@ -148,13 +174,19 @@ const DocumentVault = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan={4} className="p-12 text-center text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-40">
+                    No encrypted assets found in your sector.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Side Detail Panel */}
+      {/* Detail Sidebar / Modal */}
       <AnimatePresence>
         {selectedDoc && (
           <>
@@ -171,7 +203,6 @@ const DocumentVault = () => {
                 <h2 className="text-3xl font-black uppercase tracking-tighter leading-none">{selectedDoc.name}</h2>
               </div>
 
-              {/* Advanced Chart */}
               <div className="bg-muted/30 p-8 rounded-[40px] border border-border/40 relative group">
                 <div className="h-[260px] relative">
                   <ResponsiveContainer width="100%" height="100%">
@@ -184,37 +215,22 @@ const DocumentVault = () => {
                         ]}
                         innerRadius={80} outerRadius={105} paddingAngle={8} dataKey="value" stroke="none"
                       >
-                        {COLORS.map((c, i) => <Cell key={i} fill={c} cornerRadius={12} className="hover:opacity-80 transition-opacity" />)}
+                        {COLORS.map((c, i) => <Cell key={i} fill={c} cornerRadius={12} />)}
                       </Pie>
-                        <Tooltip 
-  content={({ active, payload }) => {
-    if (active && payload && payload.length) {
-      // payload[0].payload كيعطينا البيانات الحقيقية للي دوزنا فـ الـ Pie Chart
-      const { name, value } = payload[0].payload;
-      return (
-        <div className="glass-card px-4 py-3 border border-border/50 rounded-2xl shadow-2xl bg-white/95 backdrop-blur-xl">
-          <div className="flex flex-col gap-1">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-accent/80">
-              Analysis Segment
-            </p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-sm font-black text-slate-900 uppercase tracking-tight">
-                {name}:
-              </span>
-              <span className="text-lg font-black text-accent tracking-tighter">
-                {value}%
-              </span>
-            </div>
-            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest border-t border-slate-100 pt-1 mt-1">
-              Relative Risk Index
-            </p>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  }}
-/>
+                      <Tooltip 
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const { name, value } = payload[0].payload;
+                            return (
+                              <div className="glass-card px-4 py-3 border border-border/50 rounded-2xl shadow-2xl bg-white/95 backdrop-blur-xl">
+                                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-accent/80">Segment</p>
+                                <span className="text-sm font-black text-slate-900 uppercase">{name}: {value}%</span>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
@@ -224,26 +240,27 @@ const DocumentVault = () => {
                 </div>
               </div>
 
-              {/* Critical Findings Section - NEW */}
+              {/* Anomaly Alerts */}
               <div className="space-y-4">
                 <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-orange-500" /> Detected Anomalies</h3>
                 <div className="space-y-2">
                     {selectedDoc.risk_score > 40 ? (
                         <div className="p-5 rounded-2xl bg-red-500/5 border border-red-500/10 border-l-4 border-l-red-500">
                              <p className="text-[11px] font-bold text-red-500 uppercase tracking-tight leading-relaxed">
-                               CRITICAL: This document contains non-standard liability clauses and high financial exposure markers.
+                               CRITICAL: This document contains non-standard liability clauses.
                              </p>
                         </div>
                     ) : (
                         <div className="p-5 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 border-l-4 border-l-emerald-500">
                              <p className="text-[11px] font-bold text-emerald-500 uppercase tracking-tight leading-relaxed">
-                               SECURE: Logical patterns align with standard compliance frameworks. No major risks detected.
+                               SECURE: Logical patterns align with standard frameworks.
                              </p>
                         </div>
                     )}
                 </div>
               </div>
 
+              {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-6 rounded-3xl bg-muted/30 border border-border/40">
                   <p className="text-[9px] font-black text-muted-foreground uppercase mb-2 tracking-widest">Health Index</p>
@@ -261,7 +278,7 @@ const DocumentVault = () => {
                 className="mt-auto w-full py-8 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] bg-accent hover:shadow-[0_20px_40px_rgba(99,102,241,0.3)] transition-all"
               >
                 {exporting ? (
-                  <span className="animate-pulse">Synthesizing Report...</span>
+                  <span className="animate-pulse">Synthesizing...</span>
                 ) : (
                   <>
                     <Download className="h-5 w-5 mr-3" /> Generate Intelligence Audit
