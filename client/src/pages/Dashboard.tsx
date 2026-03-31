@@ -16,12 +16,23 @@ const Dashboard = () => {
     risks_found: 0, 
     compliance_rate: 0, 
     recent_activity: [],
-    credits: 0 
+    credits: 0,
+    plan: 'starter' // ✨ تمت إضافة نوع الخطة
   });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // --- 🛠️ جلب البيانات بـخصوصية تامة ---
+  // --- 🛠️ حساب السقف بناءً على نوع الخطة ---
+  const getMaxCredits = (plan: string) => {
+    const p = plan?.toLowerCase();
+    if (p === 'enterprise') return 1500;
+    if (p === 'pro') return 200;
+    return 10; // Starter / Default
+  };
+
+  const maxCredits = getMaxCredits(stats.plan);
+
+  // --- 🛠️ جلب البيانات ---
   const fetchDashboardData = useCallback(async () => {
     try {
       const userId = localStorage.getItem("user_id");
@@ -30,7 +41,6 @@ const Dashboard = () => {
         return;
       }
 
-      // إرسال الـ user_id كـ Parameter لضمان جلب بيانات المستخدم الحالي فقط
       const response = await fetch(`${API_URL}/dashboard-stats?user_id=${userId}`);
       if (!response.ok) throw new Error("Sync Error");
       const data = await response.json();
@@ -40,7 +50,8 @@ const Dashboard = () => {
         risks_found: data.total_risks || 0,
         compliance_rate: data.compliance_rate || 0,
         recent_activity: data.recent_activity || [],
-        credits: data.credits ?? 0
+        credits: data.credits ?? 0,
+        plan: data.plan || 'starter' // ✨ جلب الخطة من البايكيند
       });
     } catch (error) { 
       console.error("❌ Neural Link Error:", error); 
@@ -53,19 +64,17 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  // --- 🗑️ حذف الملف مع التحقق من الهوية ---
   const handleDelete = async (id: string) => {
     const userId = localStorage.getItem("user_id");
     if (!window.confirm("Purge this document from the vault?")) return;
     
     try {
-      // صيفطنا الـ user_id حتى فـ الـ DELETE كـ Query Param لزيادة الأمان فـ الـ Backend
       const response = await fetch(`${API_URL}/files/${id}?user_id=${userId}`, { 
         method: 'DELETE' 
       });
       
       if (response.ok) {
-        fetchDashboardData(); // تحديث الأرقام بعد الحذف
+        fetchDashboardData();
       } else {
         alert("Action denied: Unauthorized purge request.");
       }
@@ -74,7 +83,6 @@ const Dashboard = () => {
     }
   };
 
-  // معالجة بيانات الشارت
   const chartData = (stats.recent_activity || []).slice().reverse().map((file: any) => ({
     name: new Date(file.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     risk: file.risk_score || 0,
@@ -89,7 +97,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background font-sans text-foreground pb-20 overflow-x-hidden">
-      {/* Decorative Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-accent/10 blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-primary/10 blur-[100px]" />
@@ -97,34 +104,34 @@ const Dashboard = () => {
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10 pt-12 space-y-10">
         
-        {/* Top Header & Credits */}
         <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 border-b border-border/50 pb-8">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-[10px] font-bold uppercase tracking-widest mb-2">
               <Zap className="h-3 w-3 fill-current" /> Intelligence System
             </div>
             <h1 className="text-4xl font-black tracking-tighter uppercase">System <span className="gradient-text">Overview</span></h1>
+            <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Active Plan: <span className="text-accent">{stats.plan}</span></p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
-            <div className="flex flex-col gap-1.5 min-w-[180px]">
+            <div className="flex flex-col gap-1.5 min-w-[220px]">
               <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border border-border/40 rounded-2xl backdrop-blur-md">
                 <div className="flex flex-col">
                   <span className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Neural Credits</span>
                   <div className="flex items-center gap-1.5">
                     <span className="text-xl font-black">{stats.credits}</span>
-                    <span className="text-[10px] font-bold text-muted-foreground opacity-50">/ 10</span>
+                    <span className="text-[10px] font-bold text-muted-foreground opacity-50">/ {maxCredits}</span>
                   </div>
                 </div>
                 <div className="p-2 bg-accent/10 rounded-xl ml-4">
-                   <Zap className={`h-4 w-4 ${stats.credits > 0 ? 'text-accent animate-pulse' : 'text-muted-foreground'}`} />
+                    <Zap className={`h-4 w-4 ${stats.credits > 0 ? 'text-accent animate-pulse' : 'text-muted-foreground'}`} />
                 </div>
               </div>
               <div className="h-1.5 w-full bg-muted/50 rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }}
-                  animate={{ width: `${(stats.credits / 10) * 100}%` }}
-                  className={`h-full transition-all duration-1000 ${stats.credits <= 2 ? 'bg-red-500' : 'bg-accent'}`}
+                  animate={{ width: `${Math.min((stats.credits / maxCredits) * 100, 100)}%` }}
+                  className={`h-full transition-all duration-1000 ${stats.credits <= (maxCredits * 0.1) ? 'bg-red-500' : 'bg-accent'}`}
                 />
               </div>
             </div>
@@ -135,7 +142,6 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* Quick Stats Grid */}
         <motion.div initial="hidden" animate="visible" variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { label: "Total Documents", val: stats.total_docs, icon: FileText, color: "text-blue-500" },
@@ -155,7 +161,6 @@ const Dashboard = () => {
           ))}
         </motion.div>
 
-        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="glass-card p-8 rounded-3xl border border-border/40">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-10 flex items-center gap-3">
@@ -193,7 +198,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Activity Table */}
         <div className="glass-card rounded-3xl border border-border/40 overflow-hidden shadow-2xl">
           <div className="p-6 border-b border-border/40 flex justify-between items-center bg-muted/30">
             <h3 className="text-xs font-black uppercase tracking-widest flex items-center gap-3"><Clock className="h-4 w-4 text-accent" /> Intelligence Activity Log</h3>
