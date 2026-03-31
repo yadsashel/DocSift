@@ -245,8 +245,8 @@ const Index = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
               { name: "Starter", price: "$0", period: "/month", desc: "Explore neural auditing", features: ["10 Neural Credits/month", "Standard Risk Detection", "Email Support", "Manual PDF Uploads", "No API Access"], popular: false },
-              { name: "Pro", price: "$49", period: "/month", desc: "For solo legal professionals", features: ["200 Neural Credits/month", "Advanced AI Analysis", "Priority Email Support", "API Access (Standard)", "90-Day Audit History", "Custom Risk Policies"], popular: true },
-              { name: "Enterprise", price: "$199", period: "/month", desc: "For high-volume business", features: ["1500 Neural Credits/month", "Unlimited API Requests", "Dedicated Success Manager", "Custom Policy Training", "SSO & SCIM Security", "24/7 Phone Support"], popular: false },
+              { name: "Pro", price: "$29", period: "/month", desc: "For solo legal professionals", features: ["200 Neural Credits/month", "Advanced AI Analysis", "Priority Email Support", "API Access (Standard)", "90-Day Audit History", "Custom Risk Policies"], popular: true },
+              { name: "Enterprise", price: "$99", period: "/month", desc: "For high-volume business", features: ["1500 Neural Credits/month", "Unlimited API Requests", "Dedicated Success Manager", "Custom Policy Training", "SSO & SCIM Security", "24/7 Phone Support"], popular: false },
             ].map((plan, i) => (
               <motion.div key={i} variants={fadeInUp} className={`rounded-2xl p-8 relative ${plan.popular ? "gradient-bg text-primary-foreground glow scale-[1.02]" : "glass-card-hover"}`}>
                 {plan.popular && (
