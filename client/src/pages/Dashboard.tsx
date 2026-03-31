@@ -25,9 +25,10 @@ const Dashboard = () => {
   // --- 🛠️ حساب السقف بناءً على نوع الخطة ---
   const getMaxCredits = (plan: string) => {
     const p = plan?.toLowerCase();
-    if (p === 'enterprise') return 1500;
-    if (p === 'pro') return 200;
-    return 10; // Starter / Default
+    const baseCredits = 10; // الـ Free Trial اللي عند كلشي
+    if (p === 'enterprise') return 1500 + baseCredits;
+    if (p === 'pro') return 200 + baseCredits;
+    return baseCredits;
   };
 
   const maxCredits = getMaxCredits(stats.plan);
