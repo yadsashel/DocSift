@@ -15,7 +15,6 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
 import DPA from "./pages/DPA";
-import SOC2 from "./pages/SOC2";
 import ApiDocs from "./pages/ApiDocs";
 import NotFound from "./pages/NotFound";
 
@@ -48,7 +47,6 @@ const App = () => (
           <Route path="/terms" element={<Terms />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/dpa" element={<DPA />} />
-          <Route path="/SOC2" element={<SOC2 />} />
           <Route path="/apidocs" element={<ApiDocs />} />
 
           {/*2. الصفحات المحمية (ممنوع الدخول بلا Login) */}
