@@ -3,7 +3,7 @@ import LegalLayout from "@/components/layout/LegalLayout";
 const Terms = () => (
   <LegalLayout title="Terms of Service" lastUpdated="February 1, 2026">
     <h2>1. Acceptance of Terms</h2>
-    <p>These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "you," or "your") and DocSift, Inc. ("DocSift," "we," "our," or "us") governing your access to and use of the DocSift contract analysis platform, website, APIs, and related services (collectively, the "Services"). By creating an account or using our Services, you agree to be bound by these Terms.</p>
+    <p>These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "you," or "your") and DocSift (operated by Elyazid [Your Last Name], "DocSift," "we," "our," or "us") governing your access to and use of the DocSift contract analysis platform, website, APIs, and related services (collectively, the "Services"). By creating an account or using our Services, you agree to be bound by these Terms.</p>
 
     <h2>2. Description of Services</h2>
     <p>DocSift provides an AI-powered contract analysis and vendor compliance auditing platform that enables organizations to upload, analyze, and manage contractual documents. Our Services include, but are not limited to:</p>
