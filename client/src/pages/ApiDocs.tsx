@@ -10,7 +10,6 @@ import Footer from "@/components/layout/Footer";
 const fadeInUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 
 const ApiDocs = () => {
-  // دالة باش تهبط لـ Section بـ Smooth Scroll
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -29,13 +28,13 @@ const ApiDocs = () => {
       <div className="pt-32 pb-20 container mx-auto px-4 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-12">
           
-          {/* Sidebar Navigation - Fixed */}
+          {/* Sidebar Navigation */}
           <aside className="lg:w-64 shrink-0 hidden lg:block">
             <div className="sticky top-40 space-y-8 border-l border-border/50 pl-6 font-sans">
               <div>
                 <h4 className="text-sm font-bold uppercase tracking-widest text-accent mb-4">Introduction</h4>
                 <ul className="space-y-3 text-sm text-muted-foreground">
-                  <li onClick={() => scrollToSection('getting-started')} className="hover:text-accent cursor-pointer transition-colors font-medium">Getting Started</li>
+                  <li onClick={() => scrollToSection('getting-started')} className="hover:text-accent cursor-pointer transition-colors font-medium">Overview</li>
                   <li onClick={() => scrollToSection('authentication')} className="hover:text-accent cursor-pointer transition-colors">Authentication</li>
                   <li onClick={() => scrollToSection('rate-limits')} className="hover:text-accent cursor-pointer transition-colors">Rate Limits</li>
                 </ul>
@@ -45,7 +44,7 @@ const ApiDocs = () => {
                 <ul className="space-y-3 text-sm text-muted-foreground">
                   <li onClick={() => scrollToSection('neural-analysis')} className="hover:text-accent cursor-pointer transition-colors">Neural Analysis</li>
                   <li onClick={() => scrollToSection('risk-scoring')} className="hover:text-accent cursor-pointer transition-colors">Risk Scoring</li>
-                  <li onClick={() => scrollToSection('batch-processing')} className="hover:text-accent cursor-pointer transition-colors">Batch Processing</li>
+                  <li onClick={() => scrollToSection('privacy-headers')} className="hover:text-accent cursor-pointer transition-colors">Privacy Headers</li>
                   <li onClick={() => scrollToSection('webhooks')} className="hover:text-accent cursor-pointer transition-colors">Webhooks</li>
                 </ul>
               </div>
@@ -57,7 +56,7 @@ const ApiDocs = () => {
             <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
               <h1 className="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight" id="getting-started">API Documentation</h1>
               <p className="text-xl text-muted-foreground mb-12 leading-relaxed">
-                Build next-gen legal tools using DocSift's intelligence. Our API delivers high-fidelity risk analysis in milliseconds.
+                Integrate DocSift's privacy-first NLP into your workflow. Our API provides local-host neural processing to ensure your legal documents never stay on third-party servers.
               </p>
 
               {/* Authentication */}
@@ -69,31 +68,10 @@ const ApiDocs = () => {
                   <h2 className="text-2xl font-bold">Authentication</h2>
                 </div>
                 <div className="glass-card p-8 rounded-3xl border border-border/50">
-                  <p className="mb-6 text-muted-foreground">Include your key in the header of all requests:</p>
+                  <p className="mb-6 text-muted-foreground">All requests to the DocSift API must include your API Key in the <code className="text-accent font-bold">Authorization</code> header:</p>
                   <div className="bg-slate-950 rounded-2xl p-6 font-mono text-sm text-slate-300 relative group overflow-x-auto border border-white/5">
-                    <code>Authorization: Bearer ds_live_xxxxxxxxxxxx</code>
+                    <code>Authorization: Bearer ds_live_salhi_xxxxxxxxxxxx</code>
                   </div>
-                </div>
-              </section>
-
-              {/* Rate Limits */}
-              <section className="mb-24 scroll-mt-32" id="rate-limits">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                    <Zap className="h-5 w-5 text-white" />
-                  </div>
-                  <h2 className="text-2xl font-bold">Rate Limits</h2>
-                </div>
-                <p className="text-muted-foreground mb-4">Standard limits per plan:</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-xl border border-border bg-secondary/20">
-                        <p className="text-xs font-bold text-accent uppercase tracking-tighter mb-1">Starter / Pro</p>
-                        <p className="text-lg font-bold font-mono">100 req/min</p>
-                    </div>
-                    <div className="p-4 rounded-xl border border-border bg-secondary/20">
-                        <p className="text-xs font-bold text-accent uppercase tracking-tighter mb-1">Enterprise</p>
-                        <p className="text-lg font-bold font-mono">Unlimited*</p>
-                    </div>
                 </div>
               </section>
 
@@ -105,37 +83,31 @@ const ApiDocs = () => {
                   </div>
                   <h2 className="text-2xl font-bold">Neural Analysis</h2>
                 </div>
+                <p className="text-muted-foreground mb-6">Initialize a deep audit of your legal contracts using local-first NLP engines.</p>
                 <div className="bg-slate-950 rounded-2xl p-6 font-mono text-sm text-slate-300 shadow-xl overflow-x-auto border border-white/5 mb-6">
-                  <p className="text-slate-500 mb-2">// POST /v1/audit/neural</p>
+                  <p className="text-slate-500 mb-2">// POST https://client-chi-fawn.vercel.app/api/v1/audit/neural</p>
                   <pre className="text-xs text-blue-300">
 {`{
-  "document_url": "https://docs.com/contract.pdf",
+  "document_url": "https://your-secure-storage.com/contract_001.pdf",
+  "analysis_mode": "privacy_first",
   "deep_scan": true
 }`}
                   </pre>
                 </div>
               </section>
 
-              {/* Risk Scoring */}
-              <section className="mb-24 scroll-mt-32" id="risk-scoring">
+              {/* Privacy Headers Section */}
+              <section className="mb-24 scroll-mt-32" id="privacy-headers">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/20">
-                    <BarChart3 className="h-5 w-5 text-white" />
+                  <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg">
+                    <Lock className="h-5 w-5 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold">Risk Scoring</h2>
+                  <h2 className="text-2xl font-bold">Privacy Headers</h2>
                 </div>
-                <p className="text-muted-foreground">Detailed numerical analysis of contract liability exposure (0-100 scale).</p>
-              </section>
-
-              {/* Batch Processing */}
-              <section className="mb-24 scroll-mt-32" id="batch-processing">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
-                    <Layers className="h-5 w-5 text-white" />
-                  </div>
-                  <h2 className="text-2xl font-bold">Batch Processing</h2>
+                <p className="text-muted-foreground mb-4">DocSift supports strict data residency. Control where your metadata is stored:</p>
+                <div className="bg-slate-950 rounded-2xl p-6 font-mono text-sm text-slate-300 border border-white/5">
+                    <code>X-DocSift-Sovereignty: local-only</code>
                 </div>
-                <p className="text-muted-foreground">Process up to 1,000 documents in a single asynchronous request.</p>
               </section>
 
               {/* Webhooks */}
@@ -146,7 +118,18 @@ const ApiDocs = () => {
                   </div>
                   <h2 className="text-2xl font-bold">Webhooks</h2>
                 </div>
-                <p className="text-muted-foreground">Receive real-time JSON updates to your server when a scan is completed.</p>
+                <p className="text-muted-foreground mb-4">Receive real-time results once the neural engine completes its audit.</p>
+                <div className="bg-slate-950 rounded-2xl p-6 font-mono text-sm text-slate-300 border border-white/5">
+                  <p className="text-slate-500 mb-2">// Sample JSON Payload</p>
+                  <pre className="text-xs text-green-300">
+{`{
+  "event": "audit.completed",
+  "risk_score": 88,
+  "vulnerabilities": ["indemnity_gap", "liability_limit_exceeded"],
+  "processing_time": "420ms"
+}`}
+                  </pre>
+                </div>
               </section>
 
             </motion.div>
