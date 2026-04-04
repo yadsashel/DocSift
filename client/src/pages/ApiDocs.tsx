@@ -88,7 +88,7 @@ const ApiDocs = () => {
                   <p className="text-slate-500 mb-2">// POST https://client-chi-fawn.vercel.app/api/v1/audit/neural</p>
                   <pre className="text-xs text-blue-300">
 {`{
-  "document_url": "https://your-secure-storage.com/contract_001.pdf",
+  "document_url": "https://api.example.com/v1/assets/contract_sample.pdf",
   "analysis_mode": "privacy_first",
   "deep_scan": true
 }`}
