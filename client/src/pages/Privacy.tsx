@@ -65,13 +65,6 @@ const Privacy = () => (
       no international transfer of sensitive document data occurs through our Services.
     </p>
 
-    <h2>9. Contact Us</h2>
-    <p>If you have questions about this Privacy Policy, please contact:</p>
-    <ul>
-      <li>Email: <strong>docsift.official@gmail.com</strong></li>
-      <li>Operator: <strong>Elyazid Salhi</strong></li>
-    </ul>
-
     <h2>10. Refund Policy</h2>
     <p>
       At DocSift, we are confident in our neural engine's accuracy. However, we offer a 
@@ -80,6 +73,15 @@ const Privacy = () => (
       full refund by emailing <strong>docsift.official@gmail.com</strong>. After 14 days, 
       all payments are non-refundable.
     </p>
+
+    <h2>9. Contact Us</h2>
+    <p>If you have questions about this Privacy Policy, please contact:</p>
+    <ul>
+      <li>Email: <strong>docsift.official@gmail.com</strong></li>
+      <li>Operator: <strong>Elyazid Salhi</strong></li>
+    </ul>
+
+    
   </LegalLayout>
 );
 
