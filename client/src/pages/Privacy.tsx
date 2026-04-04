@@ -71,6 +71,15 @@ const Privacy = () => (
       <li>Email: <strong>docsift.official@gmail.com</strong></li>
       <li>Operator: <strong>Elyazid Salhi</strong></li>
     </ul>
+
+    <h2>10. Refund Policy</h2>
+    <p>
+      At DocSift, we are confident in our neural engine's accuracy. However, we offer a 
+      <strong> 14-day full refund policy</strong>. If you are not satisfied with our 
+      Services within the first 14 days of your initial purchase, you may request a 
+      full refund by emailing <strong>docsift.official@gmail.com</strong>. After 14 days, 
+      all payments are non-refundable.
+    </p>
   </LegalLayout>
 );
 
