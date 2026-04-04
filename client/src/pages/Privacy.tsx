@@ -67,11 +67,10 @@ const Privacy = () => (
 
     <h2>9. Refund Policy</h2>
     <p>
-      At DocSift, we are confident in our neural engine's accuracy. However, we offer a 
-      <strong> 14-day full refund policy</strong>. If you are not satisfied with our 
-      Services within the first 14 days of your initial purchase, you may request a 
-      full refund by emailing <strong>docsift.official@gmail.com</strong>. After 14 days, 
-      all payments are non-refundable.
+      At DocSift, we offer a <strong>minimum 14-day refund window with no exceptions or conditions</strong>. 
+      If you are not satisfied with our Services for any reason within the first 14 days of your initial purchase, 
+      you are entitled to a full refund. Please contact us at <strong>docsift.official@gmail.com</strong> 
+      to process your request.
     </p>
 
     <h2>10. Contact Us</h2>
