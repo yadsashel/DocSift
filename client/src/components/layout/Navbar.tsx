@@ -7,7 +7,6 @@ import logo from "@/assets/logo.png";
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "DPA", href: "/dpa" },
-  { label: "SOC2", href: "/soc2" },
   { label: "Privacy & Policy", href: "/privacy" },
   { label: "Terms of Service", href: "/terms" },
   { label: "Contact", href: "/contact" },
