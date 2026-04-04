@@ -65,7 +65,7 @@ const Privacy = () => (
       no international transfer of sensitive document data occurs through our Services.
     </p>
 
-    <h2>10. Refund Policy</h2>
+    <h2>9. Refund Policy</h2>
     <p>
       At DocSift, we are confident in our neural engine's accuracy. However, we offer a 
       <strong> 14-day full refund policy</strong>. If you are not satisfied with our 
@@ -74,7 +74,7 @@ const Privacy = () => (
       all payments are non-refundable.
     </p>
 
-    <h2>9. Contact Us</h2>
+    <h2>10. Contact Us</h2>
     <p>If you have questions about this Privacy Policy, please contact:</p>
     <ul>
       <li>Email: <strong>docsift.official@gmail.com</strong></li>
