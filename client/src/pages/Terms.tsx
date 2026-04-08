@@ -24,7 +24,7 @@ const Terms = () => (
     <h3>4.2 Payment Terms</h3>
     <ul>
       <li>Subscription fees are charged in advance on a monthly or annual basis, depending on your selected billing cycle.</li>
-      <li>All fees are non-refundable except as expressly stated in these Terms or required by applicable law.</li>
+      <li>Refunds are available in accordance with our Refund Policy. Please refer to our Refund Policy page for detailed information on eligibility and processing.</li>
       <li>We reserve the right to change subscription pricing with at least 30 days' advance notice. Price changes take effect at the start of your next billing cycle.</li>
     </ul>
     <h3>4.3 Free Trial</h3>
