@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useEffect } from "react"; // زدت هادي
 import { Shield, FileSearch, BarChart3, Upload, Lock, Zap, CheckCircle, ArrowRight, Star, FileText, Eye, Brain, Users, Globe, Server, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/layout/Navbar";
@@ -10,11 +11,53 @@ import contractReview from "@/assets/contract-review.jpg";
 import dataCenter from "@/assets/data-center.jpg";
 import modernOffice from "@/assets/modern-office.jpg";
 
+// Declare Paddle for TypeScript
+declare global {
+  interface Window {
+    Paddle: any;
+  }
+}
+
 const fadeInUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
 const fadeIn = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
 const stagger = { visible: { transition: { staggerChildren: 0.15 } } };
 
 const Index = () => {
+
+  // Initialize Paddle
+  useEffect(() => {
+    if (window.Paddle) {
+      window.Paddle.Initialize({ 
+        token: "pdl_live_apikey_01kkfk6j17****" // حط الـ Token ديالك هنا كامل
+      });
+    }
+  }, []);
+
+  const handlePurchase = (planName: string) => {
+    // 1. Check if user is logged in
+    const userId = localStorage.getItem("user_id"); // أو أي طريقة باش كاتعرف الـ User
+    
+    if (!userId) {
+      // إيلا ما مسجلش، صيفطو يسجل عاد يخلص
+      window.location.href = `/signup?plan=${planName}`;
+      return;
+    }
+
+    if (window.Paddle) {
+      window.Paddle.Checkout.open({
+        settings: {
+          displayMode: 'overlay',
+          theme: 'dark',
+        },
+        items: [{ priceId: priceIds[planName], quantity: 1 }],
+        customData: {
+          user_id: userId, // هادي هي اللي غاترجع ليك فـ الـ Webhook
+          plan_type: planName
+        }
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       <Navbar />
@@ -48,7 +91,7 @@ const Index = () => {
           <motion.div className="max-w-3xl mx-auto text-center" initial="hidden" animate="visible" variants={stagger}>
             <motion.div variants={fadeInUp} transition={{ duration: 0.5 }} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-medium mb-8">
               <Zap className="h-4 w-4" />
-              AI-Powered Contract Intelligence
+              Proprietary Neural Auditing Engine
             </motion.div>
 
             <motion.h1 variants={fadeInUp} transition={{ duration: 0.6 }} className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
@@ -58,7 +101,7 @@ const Index = () => {
             </motion.h1>
 
             <motion.p variants={fadeInUp} transition={{ duration: 0.6 }} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-              DocSift uses advanced AI to scan, analyze, and audit every clause in your vendor contracts detecting hidden risks and ensuring full compliance in minutes, not months.
+              DocSift uses proprietary neural engine to scan, analyze, and audit every clause in your vendor contracts detecting hidden risks and ensuring full compliance.
             </motion.p>
 
             <motion.div variants={fadeInUp} transition={{ duration: 0.6 }} className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -100,7 +143,7 @@ const Index = () => {
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: FileSearch, title: "Contract Analysis", desc: "AI scans every clause, identifying ambiguities, unfavorable terms, and missing provisions across thousands of pages." },
+              { icon: FileSearch, title: "Contract Analysis", desc: "Proprietary engine scans every clause, identifying ambiguities, unfavorable terms, and missing provisions." },
               { icon: Shield, title: "Risk Detection", desc: "Automatically detect hidden liabilities, auto-renewal traps, and non-standard indemnification clauses." },
               { icon: BarChart3, title: "Compliance Monitoring", desc: "Continuous monitoring against GDPR, CCPA, SOX, and industry-specific regulatory frameworks." },
               { icon: Eye, title: "Vendor Auditing", desc: "Score and rank vendor agreements, track SLA adherence, and flag deviations from your standard terms." },
@@ -127,9 +170,9 @@ const Index = () => {
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
-              { step: "01", icon: Upload, title: "Upload Your Contracts", desc: "Drag and drop PDFs, DOCX files, or connect your document management system. We support batch uploads of thousands of documents.", img: contractReview },
-              { step: "02", icon: Brain, title: "AI Analyzes Every Clause", desc: "Our proprietary AI engine processes each document, cross-referencing against regulatory frameworks and your custom policies.", img: modernOffice },
-              { step: "03", icon: CheckCircle, title: "Get Actionable Insights", desc: "Receive a detailed risk report with severity ratings, remediation suggestions, and compliance scores all in minutes.", img: teamMeeting },
+              { step: "01", icon: Upload, title: "Upload Your Contracts", desc: "Drag and drop PDFs, DOCX files, or connect your document management system.", img: contractReview },
+              { step: "02", icon: Brain, title: "Neural Engine Analysis", desc: "Our proprietary engine processes each document, cross-referencing against regulatory frameworks.", img: modernOffice },
+              { step: "03", icon: CheckCircle, title: "Get Actionable Insights", desc: "Receive a detailed risk report with severity ratings, remediation suggestions, and compliance scores.", img: teamMeeting },
             ].map((item, i) => (
               <motion.div key={i} variants={fadeInUp} className="text-center">
                 <div className="relative mb-6 rounded-2xl overflow-hidden aspect-[4/3]">
@@ -166,7 +209,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ===== SECURITY / API SECTION (Updated content, same design) ===== */}
+      {/* ===== SECURITY / API SECTION ===== */}
       <section className="section-padding bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl" />
@@ -174,9 +217,9 @@ const Index = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
               <motion.p variants={fadeInUp} className="text-accent font-semibold text-sm uppercase tracking-widest mb-3">REST API v1.0</motion.p>
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-6">Integrate Contract Intelligence into Your Workflow</motion.h2>
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-6">Integrate Into Your Workflow</motion.h2>
               <motion.p variants={fadeInUp} className="text-primary-foreground/70 mb-8 leading-relaxed">
-                Connect DocSift to your CLM, ERP, or custom-built internal tools. Our robust API allows for batch processing and real-time risk webhooks.
+                Connect DocSift to your custom-built internal tools. Our robust API allows for batch processing and real-time risk webhooks.
               </motion.p>
               <motion.div variants={stagger} className="space-y-4 mb-8">
                 {[
@@ -214,9 +257,9 @@ const Index = () => {
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
-              { quote: "DocSift reduced our contract review time by 85%. We caught a $4.2M liability clause that our team had missed across 3 review cycles.", name: "Sarah Chen", role: "General Counsel, TechForge Inc." },
-              { quote: "The vendor compliance auditing alone saved us from two major regulatory penalties. It's now indispensable to our procurement workflow.", name: "Michael Torres", role: "VP of Compliance, Meridian Capital" },
-              { quote: "We process over 10,000 vendor contracts annually. DocSift handles the entire pipeline with incredible accuracy and speed.", name: "Amanda Liu", role: "Head of Legal Ops, Vertex Global" },
+              { quote: "DocSift reduced our contract review time by 85%. We caught a $4.2M liability clause that our team had missed.", name: "Sarah Chen", role: "General Counsel, TechForge Inc." },
+              { quote: "The vendor compliance auditing alone saved us from major penalties. It's now indispensable.", name: "Michael Torres", role: "VP of Compliance, Meridian Capital" },
+              { quote: "We process over 10,000 contracts annually. DocSift handles the entire pipeline with speed.", name: "Amanda Liu", role: "Head of Legal Ops, Vertex Global" },
             ].map((t, i) => (
               <motion.div key={i} variants={fadeInUp} className="glass-card-hover rounded-2xl p-8">
                 <div className="flex gap-1 mb-4">
@@ -233,7 +276,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ===== PRICING (Updated with Real SaaS Logic, Design Unchanged) ===== */}
+      {/* ===== PRICING ===== */}
       <section id="pricing" className="section-padding bg-secondary/30">
         <div className="container mx-auto px-4 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center max-w-2xl mx-auto mb-16">
@@ -244,9 +287,9 @@ const Index = () => {
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
-              { name: "Starter", price: "$0", period: "/month", desc: "Explore neural auditing", features: ["10 Neural Credits/month", "Standard Risk Detection", "Email Support", "Manual PDF Uploads", "No API Access"], popular: false },
-              { name: "Pro", price: "$29", period: "/month", desc: "For solo legal professionals", features: ["200 Neural Credits/month", "Advanced AI Analysis", "Priority Email Support", "API Access (Standard)", "90-Day Audit History", "Custom Risk Policies"], popular: true },
-              { name: "Enterprise", price: "$99", period: "/month", desc: "For high-volume business", features: ["1500 Neural Credits/month", "Unlimited API Requests", "Dedicated Success Manager", "Custom Policy Training", "SSO & SCIM Security", "24/7 Phone Support"], popular: false },
+              { name: "Starter", price: "$0", period: "/month", desc: "Explore neural auditing", features: ["10 Neural Credits/month", "Standard Risk Detection", "Email Support", "Manual PDF Uploads"], popular: false },
+              { name: "Pro", price: "$29", period: "/month", desc: "For solo legal professionals", features: ["200 Neural Credits/month", "Advanced Analysis", "API Access", "Custom Risk Policies"], popular: true },
+              { name: "Enterprise", price: "$99", period: "/month", desc: "For high-volume business", features: ["1500 Neural Credits/month", "Unlimited API Requests", "Custom Policy Training", "24/7 Phone Support"], popular: false },
             ].map((plan, i) => (
               <motion.div key={i} variants={fadeInUp} className={`rounded-2xl p-8 relative ${plan.popular ? "gradient-bg text-primary-foreground glow scale-[1.02]" : "glass-card-hover"}`}>
                 {plan.popular && (
@@ -266,8 +309,12 @@ const Index = () => {
                     </li>
                   ))}
                 </ul>
-                <Button variant={plan.popular ? "secondary" : "gradient"} className="w-full" asChild>
-                  <Link to={`/signup?plan=${plan.name.toLowerCase()}`}>Get Started</Link>
+                <Button 
+                  variant={plan.popular ? "secondary" : "gradient"} 
+                  className="w-full"
+                  onClick={() => handlePurchase(plan.name.toLowerCase())} // ربط Paddle هنا
+                >
+                  {plan.name === "Starter" ? "Get Started" : "Buy Now"}
                 </Button>
               </motion.div>
             ))}
@@ -284,11 +331,9 @@ const Index = () => {
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="space-y-4">
             {[
-              { q: "What are Neural Credits?", a: "One Neural Credit allows you to audit one document (up to 100 pages). Credits reset every month based on your selected plan." },
-              { q: "How does the API Access work?", a: "Our REST API allows you to integrate DocSift's auditing engine directly into your software. Pro includes standard rate limits, while Enterprise is custom-tailored." },
-              { q: "Is my data secure?", a: "Absolutely. DocSift is SOC 2 Type II certified, encrypts all data with AES-256, and never uses your documents to train our public models." },
-              { q: "Can I cancel my subscription anytime?", a: "Yes, you can cancel or downgrade your plan at any time through your dashboard settings." },
-              { q: "How long does it take to analyze a contract?", a: "Most contracts are fully analyzed in under 3 minutes. Batch processing of large document sets is available on Enterprise plans." },
+              { q: "What are Neural Credits?", a: "One Neural Credit allows you to audit one document. Credits reset every month." },
+              { q: "Is my data secure?", a: "Absolutely. DocSift never uses your documents to train public models." },
+              { q: "Can I cancel anytime?", a: "Yes, you can cancel or downgrade your plan at any time." },
             ].map((faq, i) => (
               <motion.details key={i} variants={fadeInUp} className="glass-card rounded-xl group">
                 <summary className="flex items-center justify-between cursor-pointer p-6 text-foreground font-medium list-none">
@@ -308,7 +353,7 @@ const Index = () => {
         <div className="container mx-auto px-4 lg:px-8 relative z-10 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-2xl mx-auto">
             <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-6">Ready to Eliminate Contract Blind Spots?</motion.h2>
-            <motion.p variants={fadeInUp} className="text-primary-foreground/70 text-lg mb-8">Designed for High-Growth Legal Teams to protect their business. Start your free trial today no credit card required.</motion.p>
+            <motion.p variants={fadeInUp} className="text-primary-foreground/70 text-lg mb-8">Start your free trial today no credit card required.</motion.p>
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button variant="secondary" size="lg" className="text-base px-8 h-12" asChild>
                 <Link to="/signup">Start Free Trial <ArrowRight className="ml-2 h-4 w-4" /></Link>
