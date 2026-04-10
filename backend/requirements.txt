@@ -13,3 +13,4 @@ python-jose[cryptography]
 passlib[bcrypt]
 pandas
 jinja2
+slowapi

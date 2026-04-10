@@ -2,8 +2,9 @@
 FROM python:3.9
 
 # نصب المكتبات ديال الـ System اللي كيحتاج OCR و OpenCV
+# تم تحديث libgl1-mesa-glx لـ libgl1 باش يخدم مع النسخ الجديدة
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     gcc \
     python3-dev \
@@ -25,4 +26,5 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 COPY --chown=user . .
 
 # تشغيل السيرفر على بورت 7860
+# ملاحظة: تأكد أن app_port فـ README هو 7860 باش يتطابق مع هاد الكوموند
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]

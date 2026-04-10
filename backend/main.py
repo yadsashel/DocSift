@@ -3,17 +3,18 @@ import jwt
 import asyncio
 import uuid
 import smtplib
-import resend
 import random
 import traceback
 import easyocr
 import hashlib
+import hmac
 import numpy as np
 from PIL import Image
 from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks, Depends, Request, Form, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security.api_key import APIKeyHeader
 from email.mime.text import MIMEText
+from typing import Optional
 from email.mime.multipart import MIMEMultipart
 from fastapi.responses import FileResponse, JSONResponse 
 from datetime import datetime, timedelta
@@ -87,7 +88,6 @@ class VerifyOTP(BaseModel):
     email: str
     token: str
 
-resend.api_key = os.getenv("RESEND_API_KEY")
 token = os.getenv("SUPABASE_KEY")
 if token:
     try:
@@ -99,6 +99,9 @@ if token:
 # إعداد الكليينت
 url = os.getenv("SUPABASE_URL")
 supabase: Client = create_client(url, token)
+
+PADDLE_WEBHOOK_SECRET = os.getenv("PADDLE_WEBHOOK_SECRET")
+router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
 @app.get("/")
 async def read_root():
@@ -504,6 +507,88 @@ async def create_key(data: dict):
 async def delete_key(key_id: str):
     await run_sync_in_async(lambda: supabase.table("api_keys").delete().eq("id", key_id).execute())
     return {"status": "deleted"}
+
+def verify_paddle_signature(signature: str, body: bytes) -> bool:
+    """التحقق من أن الـ Request جا فعلاً من Paddle"""
+    try:
+        if not signature or not PADDLE_WEBHOOK_SECRET:
+            return False
+        
+        # Paddle Header: "ts=123456;h=abcdef..."
+        parts = dict(item.split('=') for item in signature.split(';'))
+        ts = parts.get('ts')
+        h = parts.get('h')
+        
+        if not ts or not h:
+            return False
+        
+        # الـ Payload الموقع من Paddle
+        signed_payload = f"{ts}:{body.decode('utf-8')}"
+        
+        # حساب الـ Hash عندنا
+        computed_hash = hmac.new(
+            PADDLE_WEBHOOK_SECRET.encode('utf-8'),
+            signed_payload.encode('utf-8'),
+            hashlib.sha256
+        ).hexdigest()
+        
+        return hmac.compare_digest(computed_hash, h)
+    except Exception:
+        return False
+
+# --- الـ Logic ديال تحديث الـ Credits ---
+async def fulfill_order(payload: dict):
+    """دالة لزيادة الكريديت فـ الداتابيز بعيداً عن الـ Main Route"""
+    try:
+        event_data = payload.get("data", {})
+        custom_data = event_data.get("custom_data", {})
+        
+        user_id = custom_data.get("user_id")
+        plan_type = custom_data.get("plan_type")
+        
+        if not user_id:
+            return
+        
+        credits_map = {"pro": 200, "enterprise": 1500}
+        amount = credits_map.get(plan_type, 0)
+        
+        if amount > 0:
+            # تحديث الـ Profile فـ Supabase
+            # كنستعملو الـ current credits ونزيدو عليها
+            profile = supabase.table("profiles").select("credits").eq("id", user_id).single().execute()
+            new_total = (profile.data.get("credits", 0) if profile.data else 0) + amount
+            
+            supabase.table("profiles").update({"credits": new_total, "plan": plan_type}).eq("id", user_id).execute()
+            print(f"✅ User {user_id} upgraded! +{amount} credits added.")
+            
+    except Exception as e:
+        print(f"❌ Fulfillment Error: {str(e)}")
+
+# --- الـ Webhook Route المطور ---
+@app.post("/webhooks/paddle") # تأكد من الـ Path فـ Dashboard
+async def paddle_webhook(
+    request: Request, 
+    background_tasks: BackgroundTasks,
+    paddle_signature: Optional[str] = Header(None)
+):
+    # 1. جيب الـ Raw Body للتحقق
+    body = await request.body()
+    
+    # 2. Security Check (الضربة القاضية للهاكرز)
+    if not verify_paddle_signature(paddle_signature, body):
+        raise HTTPException(status_code=401, detail="Invalid Signature")
+
+    # 3. Parse الـ Data
+    payload = json.loads(body)
+    event_type = payload.get("event_type")
+
+    # 4. Handle Transaction
+    if event_type == "transaction.completed":
+        # صيفط المهمة لـ Background باش الـ API يجاوب Paddle بـ 200 دغيا
+        background_tasks.add_task(fulfill_order, payload)
+        return {"status": "processing"}
+
+    return {"status": "ignored"}
 
 @app.middleware("http")
 async def error_handling_middleware(request: Request, call_next):

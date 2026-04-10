@@ -6,9 +6,17 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
+// Paddle types
+declare global {
+  interface Window {
+    Paddle?: any;
+  }
+}
+
 const API_URL = import.meta.env.VITE_API_URL;
-const PRO_URL = import.meta.env.VITE_LEMON_SQUEEZY_PRO_URL;
-const ENTERPRISE_URL = import.meta.env.VITE_LEMON_SQUEEZY_ENTERPRISE_URL;
+// بدّل هاد السطورة فـ .env لـ Paddle Price IDs
+const PRO_PRICE_ID = import.meta.env.VITE_PADDLE_PRO_PRICE_ID; 
+const ENTERPRISE_PRICE_ID = import.meta.env.VITE_PADDLE_ENTERPRISE_PRICE_ID;
 
 const tabs = [
   { id: "profile", label: "Profile", icon: User },
@@ -31,7 +39,6 @@ const Settings = () => {
     job_title: ""
   });
 
-  // حالة الفريق (Team State)
   const [teamMembers, setTeamMembers] = useState([
     { id: 1, name: "Yazide (You)", email: "admin@docsift.ai", role: "Owner" }
   ]);
@@ -60,14 +67,27 @@ const Settings = () => {
     fetchUserData();
   }, []);
 
+  // --- الدالة الجديدة الخاصة بـ Paddle ---
   const handleUpgrade = (planType: 'pro' | 'enterprise') => {
-    const baseUrl = planType === 'pro' ? PRO_URL : ENTERPRISE_URL;
+    const priceId = planType === 'pro' ? PRO_PRICE_ID : ENTERPRISE_PRICE_ID;
     const userId = localStorage.getItem("user_id");
-    const checkoutUrl = `${baseUrl}?checkout[custom][user_id]=${userId}&embed=1`;
-    if (window.LemonSqueezy) {
-      window.LemonSqueezy.Url.Open(checkoutUrl);
+
+    if (window.Paddle) {
+      window.Paddle.Checkout.open({
+        settings: {
+          displayMode: "overlay",
+          theme: "dark",
+          locale: "en",
+        },
+        items: [{ priceId: priceId, quantity: 1 }],
+        customData: { user_id: userId } // هادي ضرورية للـ Webhook باش يعرف شكون اللي خلص
+      });
     } else {
-      window.open(checkoutUrl, "_blank");
+      toast({ 
+        title: "Payment Error", 
+        description: "Paddle library not loaded. Please refresh.", 
+        variant: "destructive" 
+      });
     }
   };
 
@@ -126,7 +146,6 @@ const Settings = () => {
         ))}
       </div>
 
-      {/* Profile Tab */}
       {activeTab === "profile" && (
         <div className="glass-card rounded-xl p-6 border border-border/50 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -153,7 +172,6 @@ const Settings = () => {
         </div>
       )}
 
-      {/* Team Tab - WORKING SECTION */}
       {activeTab === "team" && (
         <div className="glass-card rounded-xl p-6 border border-border/50 space-y-6">
           <div className="flex justify-between items-center">
@@ -195,7 +213,6 @@ const Settings = () => {
         </div>
       )}
 
-      {/* Billing Tab */}
       {activeTab === "billing" && (
         <div className="space-y-4">
           <div className="glass-card rounded-xl p-6 border border-primary/20 bg-primary/5 flex justify-between items-center">
@@ -222,7 +239,7 @@ const Settings = () => {
             <div className="glass-card rounded-xl p-6 border border-border/50 flex flex-col items-center justify-center text-center opacity-50">
               <Mail className="h-6 w-6 mb-2 opacity-30" />
               <p className="text-[10px] font-bold uppercase tracking-widest">Invoices & Billing History</p>
-              <p className="text-[9px] text-muted-foreground italic">Syncing with payment gateway...</p>
+              <p className="text-[9px] text-muted-foreground italic">Syncing with Paddle...</p>
             </div>
           </div>
         </div>
