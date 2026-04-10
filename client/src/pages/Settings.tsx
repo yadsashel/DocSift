@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
-// Paddle types
+// Paddle TypeScript Definition
 declare global {
   interface Window {
     Paddle?: any;
@@ -14,8 +14,11 @@ declare global {
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
-// بدّل هاد السطورة فـ .env لـ Paddle Price IDs
-const PRO_PRICE_ID = import.meta.env.VITE_PADDLE_PRO_PRICE_ID; 
+const PADDLE_TOKEN = import.meta.env.VITE_PUBLIC_PADDLE_CLIENT_TOKEN;
+const PADDLE_ENV = import.meta.env.VITE_PUBLIC_PADDLE_ENV || "production";
+
+// Price IDs from your .env
+const PRO_PRICE_ID = import.meta.env.VITE_PADDLE_PRO_PRICE_ID;
 const ENTERPRISE_PRICE_ID = import.meta.env.VITE_PADDLE_ENTERPRISE_PRICE_ID;
 
 const tabs = [
@@ -44,6 +47,16 @@ const Settings = () => {
   ]);
   const [newMemberEmail, setNewMemberEmail] = useState("");
 
+  // Initialize Paddle on Mount
+  useEffect(() => {
+    if (window.Paddle) {
+      window.Paddle.Setup({ 
+        token: PADDLE_TOKEN,
+        environment: PADDLE_ENV 
+      });
+    }
+  }, []);
+
   useEffect(() => {
     const fetchUserData = async () => {
       const userId = localStorage.getItem("user_id");
@@ -67,10 +80,18 @@ const Settings = () => {
     fetchUserData();
   }, []);
 
-  // --- الدالة الجديدة الخاصة بـ Paddle ---
   const handleUpgrade = (planType: 'pro' | 'enterprise') => {
     const priceId = planType === 'pro' ? PRO_PRICE_ID : ENTERPRISE_PRICE_ID;
     const userId = localStorage.getItem("user_id");
+
+    if (!priceId) {
+      toast({ 
+        title: "Configuration Error", 
+        description: `Price ID for ${planType} is missing in .env`, 
+        variant: "destructive" 
+      });
+      return;
+    }
 
     if (window.Paddle) {
       window.Paddle.Checkout.open({
@@ -80,12 +101,12 @@ const Settings = () => {
           locale: "en",
         },
         items: [{ priceId: priceId, quantity: 1 }],
-        customData: { user_id: userId } // هادي ضرورية للـ Webhook باش يعرف شكون اللي خلص
+        customData: { user_id: userId } 
       });
     } else {
       toast({ 
-        title: "Payment Error", 
-        description: "Paddle library not loaded. Please refresh.", 
+        title: "System Error", 
+        description: "Payment gateway is loading. Please try again in a moment.", 
         variant: "destructive" 
       });
     }
@@ -146,6 +167,7 @@ const Settings = () => {
         ))}
       </div>
 
+      {/* Profile Tab */}
       {activeTab === "profile" && (
         <div className="glass-card rounded-xl p-6 border border-border/50 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -172,6 +194,7 @@ const Settings = () => {
         </div>
       )}
 
+      {/* Team Tab */}
       {activeTab === "team" && (
         <div className="glass-card rounded-xl p-6 border border-border/50 space-y-6">
           <div className="flex justify-between items-center">
@@ -213,6 +236,7 @@ const Settings = () => {
         </div>
       )}
 
+      {/* Billing Tab */}
       {activeTab === "billing" && (
         <div className="space-y-4">
           <div className="glass-card rounded-xl p-6 border border-primary/20 bg-primary/5 flex justify-between items-center">
