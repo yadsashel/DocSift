@@ -249,7 +249,7 @@ const Settings = () => {
             </div>
             {userData.plan === 'starter' && (
               <Button onClick={() => handleUpgrade('pro')} className="bg-primary text-white font-bold px-8 gap-2">
-                Upgrade <Zap className="h-4 w-4 fill-current" />
+                CLICK ME PADDLE <Zap className="h-4 w-4 fill-current" />
               </Button>
             )}
           </div>
