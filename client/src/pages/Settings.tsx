@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 
 // Paddle TypeScript Definition
 declare global {
-  interface window {
+  interface Window {
     Paddle?: any;
   }
 }
@@ -46,12 +46,12 @@ const Settings = () => {
   ]);
   const [newMemberEmail, setNewMemberEmail] = useState("");
 
-  // Initialize Paddle on Mount (V3 Clean Setup)
+  // Clean Initialization for Paddle V3
   useEffect(() => {
     if (window.Paddle) {
+      // حيدنا environment تماماً باش ما يبقاش الـ Error ديال Unknown Option
       window.Paddle.Setup({ 
         token: PADDLE_TOKEN 
-        // حيدنا environment حيت كدير Error فـ V3
       });
     }
   }, []);
@@ -88,8 +88,8 @@ const Settings = () => {
 
     if (!priceId) {
       toast({ 
-        title: "Configuration Error", 
-        description: `Price ID for ${planType} is missing. Check your Vercel ENVs.`, 
+        title: "Config Error", 
+        description: `Check Vercel ENVs for ${planType} price ID`, 
         variant: "destructive" 
       });
       return;
@@ -112,8 +112,8 @@ const Settings = () => {
       });
     } else {
       toast({ 
-        title: "System Error", 
-        description: "Paddle is not loaded yet. Refresh the page.", 
+        title: "Loading...", 
+        description: "Paddle is initializing. Please wait.", 
         variant: "destructive" 
       });
     }
@@ -134,7 +134,7 @@ const Settings = () => {
       });
       if (response.ok) {
         localStorage.setItem("user_name", userData.full_name);
-        toast({ title: "Profile Updated", description: "Your changes have been saved." });
+        toast({ title: "Profile Updated", description: "Changes saved successfully." });
       }
     } catch (error) { 
         toast({ variant: "destructive", title: "Update Failed" }); 
@@ -145,24 +145,29 @@ const Settings = () => {
 
   const addTeamMember = () => {
     if (userData.plan === 'starter') {
-      toast({ title: "Upgrade Required", description: "Team features are only available for Pro & Enterprise plans.", variant: "destructive" });
+      toast({ title: "Upgrade Required", description: "Team features need Pro/Enterprise.", variant: "destructive" });
       return;
     }
     if (!newMemberEmail.includes("@")) return;
     setTeamMembers([...teamMembers, { id: Date.now(), name: "Pending...", email: newMemberEmail, role: "Member" }]);
     setNewMemberEmail("");
-    toast({ title: "Invitation Sent", description: `Invite sent to ${newMemberEmail}` });
+    toast({ title: "Invite Sent", description: `Invitation to ${newMemberEmail}` });
   };
 
   const maxCredits = userData.plan === 'enterprise' ? 1500 : userData.plan === 'pro' ? 200 : 10;
 
-  if (isFetching) return <div className="h-[60vh] flex items-center justify-center text-sm font-medium animate-pulse">Loading settings...</div>;
+  if (isFetching) return (
+    <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <p className="text-sm font-medium">Verifying DocSift Environment...</p>
+    </div>
+  );
 
   return (
     <div className="max-w-4xl space-y-6 animate-in fade-in duration-500">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground text-sm">Manage your personal profile and organization node.</p>
+        <p className="text-muted-foreground text-sm">Manage profile & billing.</p>
       </div>
 
       <div className="flex gap-1 bg-secondary/50 p-1 rounded-xl w-fit border border-border/50">
@@ -177,103 +182,80 @@ const Settings = () => {
         ))}
       </div>
 
-      {/* Profile Tab */}
       {activeTab === "profile" && (
         <div className="glass-card rounded-xl p-6 border border-border/50 space-y-6 bg-card/50">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground">Full Name</Label>
+              <Label className="text-xs font-semibold">Full Name</Label>
               <Input value={userData.full_name} onChange={(e) => setUserData({...userData, full_name: e.target.value})} className="bg-secondary/20 border-border/50 h-10" />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground">Email Address</Label>
+              <Label className="text-xs font-semibold">Email</Label>
               <Input value={userData.email} disabled className="bg-secondary/10 border-border/30 opacity-60 cursor-not-allowed" />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground">Company Name</Label>
+              <Label className="text-xs font-semibold">Company</Label>
               <Input value={userData.company} onChange={(e) => setUserData({...userData, company: e.target.value})} className="bg-secondary/20 border-border/50 h-10" />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs font-semibold text-muted-foreground">Job Title</Label>
+              <Label className="text-xs font-semibold">Title</Label>
               <Input value={userData.job_title} onChange={(e) => setUserData({...userData, job_title: e.target.value})} className="bg-secondary/20 border-border/50 h-10" />
             </div>
           </div>
-          <Button className="bg-primary text-primary-foreground h-10 px-6 font-semibold gap-2 hover:opacity-90 transition-opacity" onClick={handleSaveProfile} disabled={isLoading}>
+          <Button className="bg-primary text-primary-foreground h-10 px-6 font-semibold gap-2" onClick={handleSaveProfile} disabled={isLoading}>
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save Changes
           </Button>
         </div>
       )}
 
-      {/* Team Tab */}
       {activeTab === "team" && (
         <div className="glass-card rounded-xl p-6 border border-border/50 space-y-6 bg-card/50">
           <div className="flex justify-between items-center">
-            <h3 className="font-bold text-lg">Team Members</h3>
-            <Badge variant={userData.plan === 'starter' ? "outline" : "secondary"}>{userData.plan.toUpperCase()} Access</Badge>
+            <h3 className="font-bold text-lg">Team</h3>
+            <Badge variant="secondary">{userData.plan.toUpperCase()}</Badge>
           </div>
-          
           <div className="flex gap-2">
-            <Input 
-              placeholder="Enter email to invite..." 
-              value={newMemberEmail}
-              onChange={(e) => setNewMemberEmail(e.target.value)}
-              className="bg-secondary/20 border-border/50" 
-            />
-            <Button onClick={addTeamMember} className="gap-2 shrink-0">
-              <Plus className="h-4 w-4" /> Invite
-            </Button>
+            <Input placeholder="Email..." value={newMemberEmail} onChange={(e) => setNewMemberEmail(e.target.value)} className="bg-secondary/20" />
+            <Button onClick={addTeamMember}>Invite</Button>
           </div>
-
           <div className="space-y-3 pt-4 border-t border-border/50">
             {teamMembers.map(member => (
               <div key={member.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/10 border border-border/30">
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 bg-accent/20 rounded-full flex items-center justify-center text-[10px] font-bold">
-                    {member.name[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold leading-none">{member.name}</p>
-                    <p className="text-xs text-muted-foreground">{member.email}</p>
-                  </div>
+                  <div className="h-8 w-8 bg-accent/20 rounded-full flex items-center justify-center text-[10px] font-bold">{member.name[0]}</div>
+                  <div><p className="text-sm font-bold">{member.name}</p><p className="text-xs text-muted-foreground">{member.email}</p></div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-black uppercase tracking-widest opacity-60">{member.role}</span>
-                  {member.role !== "Owner" && <Trash2 className="h-4 w-4 text-destructive/50 hover:text-destructive cursor-pointer" />}
-                </div>
+                <span className="text-[10px] font-black uppercase opacity-60">{member.role}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Billing Tab */}
       {activeTab === "billing" && (
         <div className="space-y-4">
-          <div className="glass-card rounded-xl p-6 border border-primary/20 bg-primary/5 flex justify-between items-center shadow-[0_0_20px_rgba(var(--primary),0.1)]">
+          <div className="glass-card rounded-xl p-6 border border-primary/20 bg-primary/5 flex justify-between items-center">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-1">Current Plan</p>
+              <p className="text-xs font-bold uppercase text-primary mb-1">Plan</p>
               <h3 className="text-3xl font-black uppercase italic tracking-tighter">{userData.plan}</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                Usage: <span className="text-foreground font-bold">{userData.credits}</span> / {maxCredits} Units
-              </p>
+              <p className="text-sm text-muted-foreground">Credits: {userData.credits} / {maxCredits}</p>
             </div>
             {userData.plan === 'starter' && (
-              <Button onClick={() => handleUpgrade('pro')} className="bg-primary text-white font-bold px-8 gap-2 hover:scale-105 transition-transform">
+              <Button onClick={() => handleUpgrade('pro')} className="bg-primary text-white font-bold px-8 gap-2 shadow-lg">
                 Upgrade <Zap className="h-4 w-4 fill-current" />
               </Button>
             )}
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="glass-card rounded-xl p-6 border border-border/50 space-y-4 bg-card/50">
-              <h4 className="text-sm font-bold uppercase">Enterprise Node</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed">Unlock 1500 credits and dedicated team management for large organizations.</p>
-              <Button onClick={() => handleUpgrade('enterprise')} variant="outline" className="w-full text-xs font-bold uppercase tracking-widest hover:bg-secondary">Activate Enterprise</Button>
+              <h4 className="text-sm font-bold uppercase">Enterprise</h4>
+              <p className="text-xs text-muted-foreground">1500 credits & team management.</p>
+              <Button onClick={() => handleUpgrade('enterprise')} variant="outline" className="w-full">Activate</Button>
             </div>
-            <div className="glass-card rounded-xl p-6 border border-border/50 flex flex-col items-center justify-center text-center opacity-50 bg-card/50">
+            <div className="glass-card rounded-xl p-6 border border-border/50 flex flex-col items-center justify-center opacity-50">
               <Mail className="h-6 w-6 mb-2 opacity-30" />
-              <p className="text-[10px] font-bold uppercase tracking-widest">Invoices & Billing History</p>
-              <p className="text-[9px] text-muted-foreground italic">Syncing with Paddle...</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest">Billing History</p>
+              <p className="text-[9px] italic">Syncing...</p>
             </div>
           </div>
         </div>
