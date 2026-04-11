@@ -84,17 +84,8 @@ const Settings = () => {
 
   const handleUpgrade = (planType: 'pro' | 'enterprise') => {
     const priceId = planType === 'pro' ? PRO_PRICE_ID : ENTERPRISE_PRICE_ID;
-    const userId = localStorage.getItem("user_id");
 
-    if (!priceId) {
-      toast({ 
-        title: "Config Error", 
-        description: `Check Vercel ENVs for ${planType} price ID`, 
-        variant: "destructive" 
-      });
-      return;
-    }
-
+    // تيست: غانحيدو الـ userId والـ customData باش نشوفو واش الـ Checkout غايتحل
     if (window.Paddle) {
       window.Paddle.Checkout.open({
         settings: {
@@ -105,10 +96,8 @@ const Settings = () => {
         items: [{ 
           priceId: priceId, 
           quantity: 1 
-        }],
-        customData: { 
-          user_id: userId 
-        } 
+        }]
+        // مسحنا الـ customData هنا للتيست فقط
       });
     } else {
       toast({ 
@@ -118,7 +107,7 @@ const Settings = () => {
       });
     }
   };
-
+  
   const handleSaveProfile = async () => {
     const userId = localStorage.getItem("user_id");
     setIsLoading(true);
