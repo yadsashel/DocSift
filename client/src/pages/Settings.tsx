@@ -32,6 +32,7 @@ const Settings = () => {
   const { toast } = useToast();
 
   const [userData, setUserData] = useState({
+    id: "", // زدنا الـ ID هنا باش يكون هو المرجع
     full_name: "",
     email: "",
     plan: "starter",
@@ -53,12 +54,16 @@ const Settings = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       const userId = localStorage.getItem("user_id");
-      if (!userId) return;
+      if (!userId) {
+        setIsFetching(false);
+        return;
+      }
       try {
         const response = await fetch(`${API_URL}/auth/user/${userId}`);
         if (response.ok) {
           const data = await response.json();
           setUserData({
+            id: data.id || userId, // كنأخدو الـ ID من الـ Database مباشرة
             full_name: data.full_name || "New User",
             email: data.email || "",
             plan: data.plan || "starter",
@@ -78,7 +83,18 @@ const Settings = () => {
 
   const handleUpgrade = (planType: 'pro' | 'enterprise') => {
     const priceId = planType === 'pro' ? PRO_PRICE_ID : ENTERPRISE_PRICE_ID;
-    const userId = localStorage.getItem("user_id");
+    
+    // التغيير الكبير: كنخدمو بـ userData.id اللي تأكدنا منو من الـ API
+    const currentUserId = userData.id;
+
+    if (!currentUserId) {
+        toast({ 
+            title: "Security Sync Error", 
+            description: "We couldn't verify your session. Please refresh.", 
+            variant: "destructive" 
+        });
+        return;
+    }
 
     if (window.Paddle) {
       window.Paddle.Checkout.open({
@@ -92,7 +108,7 @@ const Settings = () => {
           quantity: 1 
         }],
         customData: {
-            userId: userId
+            userId: currentUserId // هكا Paddle غايعرف بالضبط شكون اللي خلص
         }
       });
     } else {
@@ -105,7 +121,8 @@ const Settings = () => {
   };
   
   const handleSaveProfile = async () => {
-    const userId = localStorage.getItem("user_id");
+    const userId = userData.id; // كنستعملو الـ ID الموثوق
+    if (!userId) return;
     setIsLoading(true);
     try {
       const response = await fetch(`${API_URL}/auth/user/${userId}/update`, {
@@ -203,7 +220,6 @@ const Settings = () => {
             <Button onClick={addTeamMember}>Invite</Button>
           </div>
           <div className="space-y-3 pt-4 border-t border-border/50">
-            {/* Dynamic Owner Card using fetched data */}
             <div className="flex items-center justify-between p-4 rounded-lg bg-primary/5 border border-primary/10">
               <div className="flex items-center gap-4">
                 <div className="h-10 w-10 bg-primary/20 rounded-full flex items-center justify-center">
