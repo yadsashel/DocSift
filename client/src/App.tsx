@@ -17,6 +17,7 @@ import Contact from "./pages/Contact";
 import DPA from "./pages/DPA";
 import ApiDocs from "./pages/ApiDocs";
 import NotFound from "./pages/NotFound";
+import HowItWorks from "./pages/HowItWorks";
 
 // 🛡️ Imports ديال الصفحات المحمية (Dashboard)
 import Dashboard from "./pages/Dashboard";
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/dpa" element={<DPA />} />
           <Route path="/apidocs" element={<ApiDocs />} />
+          <Route path="/howitworks" element={<HowItWorks />} />
 
           {/*2. الصفحات المحمية (ممنوع الدخول بلا Login) */}
           <Route element={<ProtectedRoute />}>

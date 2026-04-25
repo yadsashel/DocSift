@@ -253,7 +253,7 @@ const Settings = () => {
                 Upgrade <Zap className="h-4 w-4 fill-current" />
               </Button>
             )}
-          </div>
+          </div> 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="glass-card rounded-xl p-6 border border-border/50 space-y-4 bg-card/50">
               <h4 className="text-sm font-bold uppercase">Enterprise Tier</h4>

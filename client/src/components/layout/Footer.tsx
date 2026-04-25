@@ -28,6 +28,7 @@ const Footer = () => (
             <li><Link to="/privacy" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Privacy Policy</Link></li>
             <li><Link to="/terms" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">Terms of Service</Link></li>
             <li><Link to="/dpa" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">DPA</Link></li>
+            <li><Link to="/howitworks" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"> How It Works</Link></li>
           </ul>
         </div>
 

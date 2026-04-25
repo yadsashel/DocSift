@@ -10,7 +10,8 @@ const navLinks = [
   { label: "Privacy & Policy", href: "/privacy" },
   { label: "Terms of Service", href: "/terms" },
   { label: "Contact", href: "/contact" },
-  { label: "API Docs", href: "/apidocs" }
+  { label: "API Docs", href: "/apidocs" },
+  { label: "How It Works", href: "/howitworks" }
 ];
 
 const Navbar = () => {

@@ -275,13 +275,13 @@ const DocumentVault = () => {
               <Button 
                 onClick={() => handleExportAudit(selectedDoc.id, selectedDoc.name)}
                 disabled={exporting}
-                className="mt-auto w-full py-8 rounded-[2rem] font-black text-xs uppercase tracking-[0.3em] bg-accent hover:shadow-[0_20px_40px_rgba(99,102,241,0.3)] transition-all"
+                className="mt-auto w-full h-16 md:py-8 rounded-2xl md:rounded-[2rem] font-black text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.3em] bg-accent hover:shadow-[0_20px_40px_rgba(99,102,241,0.3)] transition-all flex items-center justify-center gap-2"
               >
                 {exporting ? (
                   <span className="animate-pulse">Synthesizing...</span>
                 ) : (
                   <>
-                    <Download className="h-5 w-5 mr-3" /> Generate Intelligence Audit
+                    <Download className="h-5 w-5" /> <span>Generate Intelligence Audit</span>
                   </>
                 )}
               </Button>
