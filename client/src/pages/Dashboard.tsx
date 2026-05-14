@@ -65,24 +65,38 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  const handleDelete = async (id: string) => {
-    const userId = localStorage.getItem("user_id");
-    if (!window.confirm("Purge this document from the vault?")) return;
+ const handleDelete = async (id: string) => {
+  const userId = localStorage.getItem("user_id");
+  if (!window.confirm("Purge this document from the vault?")) return;
+  
+  try {
+    // 🛠️ تنظيف الـ URL باش نتفاداو الـ // الزايدة
+    const cleanBaseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+    const finalUrl = `${cleanBaseUrl}/files/${id}?user_id=${userId}`;
     
-    try {
-      const response = await fetch(`${API_URL}/files/${id}?user_id=${userId}`, { 
-        method: 'DELETE' 
-      });
-      
-      if (response.ok) {
-        fetchDashboardData();
-      } else {
-        alert("Action denied: Unauthorized purge request.");
+    console.log("🚀 Purge Target:", finalUrl); // باش تشوف الرابط فـ Console وتأكد منو
+
+    const response = await fetch(finalUrl, { 
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
-    } catch (error) { 
-      console.error("Delete Error:", error); 
+    });
+    
+    if (response.ok) {
+      console.log("✅ Asset Purged.");
+      fetchDashboardData(); // ريفريش للداتا
+    } else {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("❌ Server Response:", errorData);
+      alert(`Action denied: ${errorData.detail || "Unauthorized purge request"}`);
     }
-  };
+  } catch (error) { 
+    console.error("🚨 Neural Link Broken:", error); 
+    alert("Connection error. Check your uplink.");
+  }
+};
 
   const chartData = (stats.recent_activity || []).slice().reverse().map((file: any) => ({
     name: new Date(file.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
