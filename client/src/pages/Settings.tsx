@@ -32,7 +32,7 @@ const Settings = () => {
   const { toast } = useToast();
 
   const [userData, setUserData] = useState({
-    id: "", // زدنا الـ ID هنا باش يكون هو المرجع
+    id: "", 
     full_name: "",
     email: "",
     plan: "starter",
@@ -60,10 +60,12 @@ const Settings = () => {
       }
       try {
         const response = await fetch(`${API_URL}/auth/user/${userId}`);
+        
         if (response.ok) {
           const data = await response.json();
+          // ✅ تأكيد أخذ الـ ID من الـ Database أو الـ localStorage كإجراء احتياطي صلب
           setUserData({
-            id: data.id || userId, // كنأخدو الـ ID من الـ Database مباشرة
+            id: data.user_id || data.id || userId, 
             full_name: data.full_name || "New User",
             email: data.email || "",
             plan: data.plan || "starter",
@@ -71,9 +73,13 @@ const Settings = () => {
             company: data.company || "",
             job_title: data.job_title || ""
           });
+        } else {
+          // ⚠️ إيلا رجع 404 أو أي خطأ، ما نخليوش الـ ID خاوي باش الـ Payment يخدم بالـ Local ID
+          setUserData(prev => ({ ...prev, id: userId }));
         }
       } catch (error) { 
         console.error("Sync Error", error); 
+        setUserData(prev => ({ ...prev, id: userId }));
       } finally { 
         setIsFetching(false); 
       }
@@ -84,8 +90,8 @@ const Settings = () => {
   const handleUpgrade = (planType: 'pro' | 'enterprise') => {
     const priceId = planType === 'pro' ? PRO_PRICE_ID : ENTERPRISE_PRICE_ID;
     
-    // التغيير الكبير: كنخدمو بـ userData.id اللي تأكدنا منو من الـ API
-    const currentUserId = userData.id;
+    // ✅ هنا الفيكس: إيلا لقى الـ state خاوية كيمشي يجرها ديريكت من الـ localStorage باش ما يبلوكيش الـ user
+    const currentUserId = userData.id || localStorage.getItem("user_id");
 
     if (!currentUserId) {
         toast({ 
@@ -121,7 +127,7 @@ const Settings = () => {
   };
   
   const handleSaveProfile = async () => {
-    const userId = userData.id; // كنستعملو الـ ID الموثوق
+    const userId = userData.id || localStorage.getItem("user_id");
     if (!userId) return;
     setIsLoading(true);
     try {
