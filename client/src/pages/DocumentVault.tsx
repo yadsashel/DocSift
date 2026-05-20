@@ -1,51 +1,62 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { FileText, Search, Filter, Download, X, Target, ChevronRight, Activity, Zap, Clock, ShieldAlert } from "lucide-react";
+import { FileText, Search, Download, X, Target, ChevronRight, Activity, Zap, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { useSearchParams, useNavigate } from "react-router-dom"; // زدنا useNavigate للحماية
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ✅ الرابط العالمي من ملف الـ .env
+// ✅ Global API Endpoint
 const API_URL = import.meta.env.VITE_API_URL;
 
-const DocumentVault = () => {
+interface DocumentBreakdown {
+  legal?: number;
+  financial?: number;
+  compliance?: number;
+}
+
+interface VaultDocument {
+  id: string;
+  name: string;
+  risk_score: number;
+  compliance_score: number;
+  created_at: string;
+  breakdown?: DocumentBreakdown;
+}
+
+const DocumentVault: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
-  const [documents, setDocuments] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedDoc, setSelectedDoc] = useState<any>(null);
-  const [exporting, setExporting] = useState(false);
+  const [search, setSearch] = useState<string>("");
+  const [documents, setDocuments] = useState<VaultDocument[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [selectedDoc, setSelectedDoc] = useState<VaultDocument | null>(null);
+  const [exporting, setExporting] = useState<boolean>(false);
 
   const COLORS = ['#6366f1', '#f59e0b', '#10b981'];
 
-  // --- 🛠️ المصلّح (The Filtered Fetch) ---
+  // --- 🛠️ Scoped Data Fetching ---
   const fetchDocs = useCallback(async () => {
-    // 1. جبد الـ user_id من الـ localStorage
     const userId = localStorage.getItem("user_id");
 
-    // 2. حماية: إيلا ماكاينش ID، صيفطو لـ Login أو حبس الـ Loading
     if (!userId) {
-      console.error("🔒 Access Denied: No user_id found.");
+      console.error("🔒 Access Denied: No valid sector identity found.");
       setLoading(false);
-      // navigate("/login"); // تقدر تفعل هادي إيلا بغيتي يخرج نيشان
       return;
     }
 
     try {
       setLoading(true);
-      // 3. صيفط الـ user_id كـ Query Parameter للـ Backend
       const res = await fetch(`${API_URL}/files?user_id=${userId}`);
       
       if (!res.ok) throw new Error("Failed to sync with vault");
       
-      const data = await res.json();
+      const data: VaultDocument[] = await res.json();
       setDocuments(data);
       
-      // التعامل مع الـ Direct Link (إيلا جاي من Dashboard بـ ID معين)
+      // Direct Link Execution (Deep Linking via Dashboard ID)
       const targetId = searchParams.get("id");
       if (targetId) {
-        const found = data.find((d: any) => d.id === targetId);
+        const found = data.find((d) => d.id === targetId);
         if (found) setSelectedDoc(found);
       }
     } catch (e) {
@@ -81,7 +92,7 @@ const DocumentVault = () => {
     }
   };
 
-  const filtered = documents.filter(d => 
+  const filtered = documents.filter((d) => 
     d.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -94,13 +105,13 @@ const DocumentVault = () => {
   return (
     <div className="relative min-h-screen bg-background text-foreground p-4 md:p-8 max-w-[1600px] mx-auto overflow-x-hidden">
       
-      {/* Background Decorative Elements */}
+      {/* Decorative Vector Accents */}
       <div className="fixed inset-0 pointer-events-none opacity-20">
         <div className="absolute top-0 right-0 w-96 h-96 bg-accent/20 blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-primary/20 blur-[100px]" />
       </div>
 
-      {/* Header Section */}
+      {/* Header Matrix */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 border-b border-border/40 pb-8">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-[9px] font-black uppercase tracking-[0.2em] mb-2">
@@ -113,12 +124,15 @@ const DocumentVault = () => {
             {documents.length} Verified Nodes
           </p>
         </div>
-        <Button className="h-14 px-10 rounded-2xl font-black text-xs uppercase tracking-widest bg-accent hover:scale-105 transition-all shadow-2xl shadow-accent/20" onClick={() => navigate("/upload")}>
+        <Button 
+          className="h-14 px-10 rounded-2xl font-black text-xs uppercase tracking-widest bg-accent hover:scale-105 transition-all shadow-2xl shadow-accent/20" 
+          onClick={() => navigate("/upload")}
+        >
           Inject New Asset
         </Button>
       </div>
 
-      {/* Search Bar */}
+      {/* Query Filter Input */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8 relative z-10">
         <div className="relative flex-1 group">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-accent transition-colors" />
@@ -126,12 +140,12 @@ const DocumentVault = () => {
             placeholder="FILTER VAULT BY IDENTIFIER..." 
             className="w-full pl-12 h-14 bg-muted/20 border border-border/40 rounded-2xl text-[10px] font-black tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
             value={search} 
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
       </div>
 
-      {/* Main Table */}
+      {/* Secured Data Matrix */}
       <div className="glass-card rounded-3xl border border-border/40 shadow-2xl overflow-hidden relative z-10">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -144,7 +158,7 @@ const DocumentVault = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/10">
-              {filtered.length > 0 ? filtered.map(doc => (
+              {filtered.length > 0 ? filtered.map((doc) => (
                 <tr key={doc.id} onClick={() => setSelectedDoc(doc)} className="group cursor-pointer hover:bg-accent/[0.03] transition-all">
                   <td className="p-6">
                     <div className="flex items-center gap-4">
@@ -186,7 +200,7 @@ const DocumentVault = () => {
         </div>
       </div>
 
-      {/* Detail Sidebar / Modal */}
+      {/* Dynamic Profile Hub */}
       <AnimatePresence>
         {selectedDoc && (
           <>
@@ -240,7 +254,7 @@ const DocumentVault = () => {
                 </div>
               </div>
 
-              {/* Anomaly Alerts */}
+              {/* Threat Matrix Alerts */}
               <div className="space-y-4">
                 <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><ShieldAlert className="h-4 w-4 text-orange-500" /> Detected Anomalies</h3>
                 <div className="space-y-2">
@@ -260,7 +274,7 @@ const DocumentVault = () => {
                 </div>
               </div>
 
-              {/* Stats Grid */}
+              {/* Structural Metrics */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-6 rounded-3xl bg-muted/30 border border-border/40">
                   <p className="text-[9px] font-black text-muted-foreground uppercase mb-2 tracking-widest">Health Index</p>
